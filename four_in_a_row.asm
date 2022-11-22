@@ -1337,5 +1337,6 @@
 		addi $s7,$s7,-1
 		j decideturn
 	Over:
-	
+		li $v0,10
+		syscall
 	
