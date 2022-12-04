@@ -1334,6 +1334,7 @@
 		syscall
 		j gameWin
 	Undo:	
+		ble $s0, 2, notUndo
 		beq $t9,0, undo2
 		#undo1:
 		beq $s6,0, notUndo
