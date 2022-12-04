@@ -21,10 +21,15 @@
 	prompt4: .asciiz "\n This column is full, try another one\n"
 	prompt5: .asciiz "\nGame end. Tie!"
 	prompt6: .asciiz "\nGame end. The winner is Player "
+	prompt7: .asciiz "\nGame end due to the a player making 3 inappropriate move.\n"
 	prompt8: .asciiz "Do you to Undo your move:\n [0]:Yes\t [Any_num]:No\n"
 .text
 	main:
 		la $s0, 0 #s0 count turns
+		
+		la $s4, 3	#s4,s5 hold inappropriate moves
+		la $s5, 3
+		
 		la $s6,3	#s6,s7 hold undo turns
 		la $s7, 3
 		
@@ -1289,13 +1294,26 @@
 		la $a0, prompt3
 		syscall
 		addi $s0, $s0,-1
+		jal CheckInapp
 		j decideturn
 	Full:
 		li $v0, 4
 		la $a0, prompt4
 		syscall
 		addi $s0, $s0,-1
+		jal CheckInapp
 		j decideturn
+	CheckInapp:
+		rem $t9, $a1, 2
+		beq $t9, 0, else
+		addi $s4, $s4,-1
+		j inapp
+		else:
+		addi $s5, $s5,-1
+		inapp:
+		beq $s4, 0, forcedLose
+		beq $s5,0 , forcedLose
+		jr $ra
 	gameTie:
 		li $v0, 4
 		la $a0, prompt5
@@ -1310,6 +1328,11 @@
 		la $v0 ,1 
 		syscall
 		j Over
+	forcedLose:
+		li $v0, 4
+		la $a0, prompt7
+		syscall
+		j gameWin
 	Undo:	
 		beq $t9,0, undo2
 		#undo1:
